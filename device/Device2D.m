@@ -64,7 +64,7 @@ classdef Device2D < Device
 
             arguments
                 obj
-                shape_name {mustBeMember(shape_name, {'Rectangle', 'Disk', 'Polygon', 'Ring'})}
+                shape_name {mustBeMember(shape_name, {'Rectangle', 'Disk', 'Polygon', 'Ring', 'GDSII'})}
             end
             arguments (Repeating)
                 varargin
@@ -79,6 +79,12 @@ classdef Device2D < Device
                     obj.geo = Polygon(varargin{:});
                 case 'Ring'
                     obj.geo = Ring(varargin{:});
+                case 'GDSII'
+                    % stack = dbstack('-completenames');
+                    % callerpath = fileparts(stack(2).file);
+                    % gdsrelativepath = varargin{:};  
+                    % gdsfilepath = fullfile(callerpath, gdsrelativepath);
+                    obj.geo = GDSII(varargin{:});
             end
         end
 
@@ -148,8 +154,8 @@ classdef Device2D < Device
             %     scattering - The solved scattering results.
 
             arguments
-                obj 
-                source Source1D 
+                obj
+                source Source1D
                 pml_thickness (1,2) {mustBePositive, mustBeInteger}
             end
 
@@ -210,9 +216,9 @@ classdef Device2D < Device
                 mu_ds(geometry_map) = obj.mat(ii).mu;
             end
             [eps1, eps2, eps3, mu1, mu2, mu3] = Device.sampleMapAll(eps_ds, mu_ds);
-            eps = cat(3, eps1, eps2, eps3); 
+            eps = cat(3, eps1, eps2, eps3);
             mu = cat(3, mu1, mu2, mu3);
-            
+
             obj.meshflag = true;
             obj.mesh = grid;
             obj.eps = eps;
@@ -312,6 +318,6 @@ classdef Device2D < Device
         end
 
     end
-    
+
 
 end

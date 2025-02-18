@@ -21,11 +21,29 @@ for expandability and scalability.
 ## Examples 
 Under the `examples/` directory, live scripts demonstrate the working flow of the Toolbox:
 
-| Structure | FDFD Solver | File Name | 
-|---|---|---|
-| Directional coupler | `Scattering2D` | `directional_coupler.mlx` |
-| Grating coupler | `Scattering2D` | `grating_coupler.mlx` |
-| Metallic transmission line | `EigenMode2D` | `transmission_line.mlx` |
+| Dimension | Structure | Description | File Name | 
+|---|---|---|---|
+| 2D | Directional coupler | 2D Scattering | `directional_coupler.mlx` |
+| 2D | Grating coupler |2D Scattering | `grating_coupler.mlx` |
+| 2D | 1x2 Inverse-designed mode division multiplexer |2D Scattering | `mode_mux_2x1.mlx` |
+| 2D | Transmission line | 2D Eigenmode (metal) | `transmission_line.mlx` |
+
+\* For the example file `mode_mux_2x1.mlx`, GDSII Toolbox is required (see section [GDSII Toolbox](#gdsii-toolbox)).
+
+## GDSII Toolbox
+GDSII is the industry standard for layouts, we have added the support for `.gds` files in our toolbox for user's convenience. 
+We utilize the [Octave / MATLAB Toolbox for GDSII Stream Format](https://github.com/ulfgri/gdsii-toolbox) by Ulf Griesmann.
+
+ To use the GDSII toolbox, please compile the mex functions in MATLAB on Windows by changing to the `./gdsii-toolbox` directory and running
+
+```
+>> makemex
+```
+To add the GDSII Toolbox to MATLAB path
+```
+>> addpath(genpath(<path/to/gdsii-toolbox>));
+>> savepath;
+```
 
 ## Feedback & Contributions
 We appreciate your feedback and contributions! If you encounter issues, have suggestions, and would 

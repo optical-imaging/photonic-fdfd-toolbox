@@ -22,8 +22,8 @@ classdef Model2D < handle
     % Methods:
     %   setLabel(plane_label) - Set the plane label for the simulation.
     %   setWavelength(wavelength) - Set the operating wavelength.
-    %   addDevice(device_layer) - Add a device layer to the model.
-    %   setDevice(device_layer) - Set the current device for modifications.
+    %   addDevice(device_seq) - Add a device sequence to the model.
+    %   setDevice(device_seq) - Set the current device for modifications.
     %   finishDevice() - Combine all device layers into a single device.
     %   setMesh(num_point, step_size, varargin) - Set the mesh for the simulation.
     %   setSolver(solver, pml_thickness) - Set the solver type and PML thickness.
@@ -99,22 +99,22 @@ classdef Model2D < handle
         end
 
         % Device
-        function addDevice(obj, device_layer)
+        function addDevice(obj, device_seq)
             arguments
                 obj
-                device_layer {mustBeInteger, mustBePositive}
+                device_seq {mustBeInteger, mustBePositive}
             end
 
             obj.checkStage(2, 'Model2D:AddDevice');
-            obj.devicelist(device_layer) = Device2D(device_layer, obj.label);
+            obj.devicelist(device_seq) = Device2D(device_seq, obj.label);
         end
 
-        function device = setDevice(obj, device_layer)
+        function device = setDevice(obj, device_seq)
             arguments
                 obj
-                device_layer {mustBeInteger, mustBePositive}
+                device_seq {mustBeInteger, mustBePositive}
             end
-            device = obj.devicelist(device_layer);
+            device = obj.devicelist(device_seq);
         end
 
         function assembleDevice(obj)
@@ -287,6 +287,7 @@ classdef Model2D < handle
                 figure;
                 imagesc(obj.mesh.axis1.v, obj.mesh.axis2.v, field_data(:,:,ii)');
                 xlabel(obj.label(1)), ylabel(obj.label(2)), axis image;
+                colormap hot; colorbar;
                 title(['Field ',num2str(ii), ' , ', data_type, '(', field_name, ')']);
             end
         end
