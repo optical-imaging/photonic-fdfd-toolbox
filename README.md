@@ -30,6 +30,24 @@ Under the `examples/` directory, live scripts demonstrate the working flow of th
 
 \* For the example file `mode_mux_2x1.mlx`, GDSII Toolbox is required (see section [GDSII Toolbox](#gdsii-toolbox)).
 
+
+
+## Methods Gallery  
+Below, we present several method syntax examples from our toolbox:
+
+| Top Class  | Method Syntax                                   | Description |
+|------------|----------------------------------------------|-------------|
+| **Layout** | `setGeometry('Rectangle', L, W, 'option')` | Define the device geometry as a rectangle with length `L` and width `W`. |
+|            | `setGeometry('Disk', R, C, 'option')`      | Define the device geometry as a circular disk with radius `R` and center `C`. |
+|            | `setGeometry('Polygon', X, Y)`            | Define the device geometry as a polygon with vertices at coordinates `X` and `Y`. |
+|            | `addPort(dir, position, range)`          | Define a port in the `dir` direction at `position`, spanning `range`. |
+| **Material** | `setMaterial(eps_r)`                      | Assign the device material with a relative permittivity of `eps_r`. |
+| **Grid**     | `setMesh([Nx, Ny], [dx, dy])`            | Configure the simulation mesh grid with dimensions `Nx*Ny` and a pixel size of `dx*dy`. |
+| **Source**   | `addSource(type, 'option')`             | Inject a source of type `type` with specified `option`. |
+
+You can find additional examples demonstrating method usage in the example codes 
+ under `.\examples` directory.
+
 ## GDSII Toolbox
 GDSII is the industry standard for layouts, we have added the support for `.gds` files in our toolbox for user's convenience. 
 We utilize the [Octave / MATLAB Toolbox for GDSII Stream Format](https://github.com/ulfgri/gdsii-toolbox) by Ulf Griesmann.

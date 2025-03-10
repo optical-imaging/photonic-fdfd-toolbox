@@ -43,7 +43,7 @@ methods
             y_coordinates (1,:) {mustBeReal}
             unit {mustBeMember(unit, {'m', 'cm', 'mm', 'um', 'nm', 'A'})} = 'm'
         end
-
+        
         obj@Layout2D(polyshape(x_coordinates, y_coordinates), unit);
     end
     

@@ -64,7 +64,7 @@ classdef Device2D < Device
 
             arguments
                 obj
-                shape_name {mustBeMember(shape_name, {'Rectangle', 'Disk', 'Polygon', 'Ring', 'GDSII'})}
+                shape_name {mustBeMember(shape_name, {'Rectangle', 'Disk', 'Polygon', 'Ring', 'GDSII', 'Bitmap'})}
             end
             arguments (Repeating)
                 varargin
@@ -82,9 +82,14 @@ classdef Device2D < Device
                 case 'GDSII'
                     % stack = dbstack('-completenames');
                     % callerpath = fileparts(stack(2).file);
-                    % gdsrelativepath = varargin{:};  
+                    % gdsrelativepath = varargin{:};
                     % gdsfilepath = fullfile(callerpath, gdsrelativepath);
                     obj.geo = GDSII(varargin{:});
+                case 'Bitmap'
+                    if ~islogical(varargin{:})
+                        error("Input must be a logical array.");
+                    end
+                    obj.geo = Bitmap2D(varargin{:});
             end
         end
 
