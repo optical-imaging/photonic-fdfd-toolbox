@@ -19,7 +19,7 @@ for expandability and scalability.
 3. Install the Toolbox by double-clicking on the `FDFDPhotonicToolbox.mltbx` in MATLAB.
 
 ## Examples 
-Under the `examples/` directory, live scripts demonstrate the working flow of the Toolbox:
+Under the `./examples` directory, live scripts demonstrate the working flow of the Toolbox:
 
 | Dimension | Structure | Description | File Name | 
 |---|---|---|---|
@@ -33,7 +33,7 @@ Under the `examples/` directory, live scripts demonstrate the working flow of th
 
 
 ## Quick Start  
-For quick start, please checkout the example models under `.\examples` directory. Here we list some frequently used methods:
+For quick start, please checkout the example models under `./examples` directory. Here we list some frequently used methods:
 
 | Top Class  | Method Syntax                                   | Description |
 |------------|----------------------------------------------|-------------|
