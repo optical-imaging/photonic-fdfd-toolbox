@@ -42,7 +42,7 @@ For quick start, please checkout the example models under `.\examples` directory
 |            | `setGeometry('Polygon', X, Y)`            | Create a plygon geometry with at a list of vertices at coordinates array `X` and `Y`. |
 |            | `addPort(dir, position, range)`          | Add a port with its norm in `dir` direction, located at `position`, with spatial extent defined in `range`. |
 | **Material** | `setMaterial(eps_r)`                      | Assign the material with relative permittivity of `eps_r`. |
-| **Grid**     | `setMesh([Nx, Ny], [dx, dy])`            | Configure the simulation mesh grid with dimensions `Nx*Ny` with pixel size of `dx*dy`. |
+| **Grid**     | `setMesh([Nx, Ny], [dx, dy])`            | Configure the simulation mesh grid with dimensions `Nx*Ny` and pixel size `dx*dy`. |
 | **Source**   | `addSource(type, 'option')`             | Add an excitation source to the simulation  |
 
 
