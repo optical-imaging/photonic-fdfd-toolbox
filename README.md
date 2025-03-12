@@ -19,7 +19,7 @@ for expandability and scalability.
 3. Install the Toolbox by double-clicking on the `FDFDPhotonicToolbox.mltbx` in MATLAB.
 
 ## Examples 
-Under the `examples/` directory, live scripts demonstrate the working flow of the Toolbox:
+Under the `./examples` directory, live scripts demonstrate the working flow of the Toolbox:
 
 | Dimension | Structure | Description | File Name | 
 |---|---|---|---|
@@ -33,7 +33,7 @@ Under the `examples/` directory, live scripts demonstrate the working flow of th
 
 
 ## Quick Start  
-For quick start, please checkout the example models under `.\examples` directory. Here we list some frequently used methods:
+For quick start, please checkout the example models under `./examples` directory. Here we list some frequently used methods:
 
 | Top Class  | Method Syntax                                   | Description |
 |------------|----------------------------------------------|-------------|
@@ -69,3 +69,18 @@ like to contribute to this project, please feel free to open an issue or contact
 For questions or inquiries, please contact:
 - Dr. Shuo Pang: pang@ucf.edu
 - Xichen Shan: xcshan@ucf.edu
+
+
+## Reference
+[1] Rumpf, R. C. (2022). 
+Electromagnetic and Photonic Simulation for the Beginner: Finite-Difference Frequency-Domain in MATLAB®. Artech House.
+
+[2] Rumpf, R. C. (2012). 
+Simple implementation of arbitrarily shaped total-field/scattered-field regions in finite-difference frequency-domain. Progress In Electromagnetics Research B, 36, 221-248.
+
+[3] Christ, A., & Hartnagel, H. L. (1987). Three-dimensional finite-difference method for the analysis of microwave-device embedding.
+ IEEE Transactions on Microwave Theory and Techniques, 35(8), 688-696.
+
+[4] Taflove, A., Hagness, S. C., & Piket-May, M. (2005). Computational electromagnetics: the finite-difference time-domain method. The Electrical Engineering Handbook, 3(629-670), 15.
+
+[5] Berenger, J. P. (1994). A perfectly matched layer for the absorption of electromagnetic waves. Journal of computational physics, 114(2), 185-200.
