@@ -32,21 +32,20 @@ Under the `examples/` directory, live scripts demonstrate the working flow of th
 
 
 
-## Methods Gallery  
-Below, we present several method syntax examples from our toolbox:
+## Quick Start  
+For quick start, please checkout the example models under `.\examples` directory. Here we list some frequently used methods:
 
 | Top Class  | Method Syntax                                   | Description |
 |------------|----------------------------------------------|-------------|
-| **Layout** | `setGeometry('Rectangle', L, W, 'option')` | Define the device geometry as a rectangle with length `L` and width `W`. |
-|            | `setGeometry('Disk', R, C, 'option')`      | Define the device geometry as a circular disk with radius `R` and center `C`. |
-|            | `setGeometry('Polygon', X, Y)`            | Define the device geometry as a polygon with vertices at coordinates `X` and `Y`. |
-|            | `addPort(dir, position, range)`          | Define a port in the `dir` direction at `position`, spanning `range`. |
-| **Material** | `setMaterial(eps_r)`                      | Assign the device material with a relative permittivity of `eps_r`. |
-| **Grid**     | `setMesh([Nx, Ny], [dx, dy])`            | Configure the simulation mesh grid with dimensions `Nx*Ny` and a pixel size of `dx*dy`. |
-| **Source**   | `addSource(type, 'option')`             | Inject a source of type `type` with specified `option`. |
+| **Layout** | `setGeometry('Rectangle', L, W, 'option')` | Create a rectangel geometry with length `L` and width `W`. |
+|            | `setGeometry('Disk', R, C, 'option')`      | Create a disk geometry with radius `R` at center coordinates `C`. |
+|            | `setGeometry('Polygon', X, Y)`            | Create a plygon geometry with at a list of vertices at coordinates array `X` and `Y`. |
+|            | `addPort(dir, position, range)`          | Add a port with its norm in `dir` direction, located at `position`, with spatial extent defined in `range`. |
+| **Material** | `setMaterial(eps_r)`                      | Assign the material with relative permittivity of `eps_r`. |
+| **Grid**     | `setMesh([Nx, Ny], [dx, dy])`            | Configure the simulation mesh grid with dimensions `Nx*Ny` with pixel size of `dx*dy`. |
+| **Source**   | `addSource(type, 'option')`             | Add an excitation source to the simulation  |
 
-You can find additional examples demonstrating method usage in the example codes 
- under `.\examples` directory.
+
 
 ## GDSII Toolbox
 GDSII is the industry standard for layouts, we have added the support for `.gds` files in our toolbox for user's convenience. 
@@ -65,7 +64,7 @@ To add the GDSII Toolbox to MATLAB path
 
 ## Feedback & Contributions
 We appreciate your feedback and contributions! If you encounter issues, have suggestions, and would 
-like to contribute to this project, please feel free to open an issue or submit a pull request.
+like to contribute to this project, please feel free to open an issue or contact us.
 
 For questions or inquiries, please contact:
 - Dr. Shuo Pang: pang@ucf.edu
