@@ -148,12 +148,38 @@ classdef Source1D < Source
             dispMessage('Source1D:VariableSetup');
         end
 
-        function obj = setPlaneWave
+        function obj = setPlaneWave(obj, wavelength, material_clad, pol, amplitude)
             % setPlaneWave - Placeholder method to set a plane wave as the source
-            %   (Method not yet implemented)
+            
+            arguments
+                obj 
+                wavelength (1,1) double {mustBePositive}
+                material_clad (1,1) Material
+                pol {mustBeMember(pol, {'TE', 'TM'})}
+                amplitude (1, 1) {mustBePositive} = 1
+            end
+
+            % profile (constant)
+            profile = amplitude*ones(size(obj.mesh.v'));
+
+            % assign field
+            field_pol = setdiff('xyz', obj.label);
+            switch pol
+                case 'TE'
+                    field_name = ['E', field_pol];
+                case 'TM'
+                    field_name = ['H', field_pol];
+            end
+            obj.(field_name) = profile;
+
+            obj.lam = wavelength;
+            obj.pol = pol;
+            obj.neff = obj.correctNeff(sqrt(material_clad.eps));
+            obj.setflag = true;
+            dispMessage('Source1D:VariableSetup');
         end
 
-        function obj = setGaussianBeam(obj, wavelength, material_clad, w0, amplitude)
+        function obj = setGaussianBeam(obj, wavelength, material_clad, w0, pol, amplitude)
             % setGaussianBeam - Sets a Gaussian beam as the source
             %
             %   Syntax:
@@ -170,6 +196,7 @@ classdef Source1D < Source
                 wavelength (1,1) double {mustBePositive}
                 material_clad (1,1) Material
                 w0 (1,1) {mustBePositive}
+                pol {mustBeMember(pol, {'TE', 'TM'})}
                 amplitude (1, 1) {mustBePositive} = 1
             end
 
@@ -179,11 +206,16 @@ classdef Source1D < Source
 
             % assign field
             field_pol = setdiff('xyz', obj.label);
-            field_name = ['E', field_pol];
+            switch pol
+                case 'TE'
+                    field_name = ['E', field_pol];
+                case 'TM'
+                    field_name = ['H', field_pol];
+            end
             obj.(field_name) = profile;
 
             obj.lam = wavelength;
-            obj.pol = 'TE';
+            obj.pol = pol;
             obj.neff = obj.correctNeff(sqrt(material_clad.eps));
             obj.setflag = true;
             dispMessage('Source1D:VariableSetup');

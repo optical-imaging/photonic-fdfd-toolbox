@@ -63,8 +63,10 @@ classdef (Abstract) FDFD2D < FDFD
 
     methods (Static, Access = protected)
 
-        function profile_rot = rotateProfile(source_field, axis_source, axis_prop, theta)
+        function profile_rot = rotateProfile(port, mesh_tp_flag, source_field, axis_source, axis_prop, theta)
             arguments
+                port Port1D
+                mesh_tp_flag
                 source_field (1,:)
                 axis_source
                 axis_prop
@@ -74,8 +76,24 @@ classdef (Abstract) FDFD2D < FDFD
             % rotate grid
             theta = theta/180*pi;
             [PROP, SOURCE] = ndgrid(axis_prop.v, axis_source.v);
-            [TH, R] = cart2pol(PROP, SOURCE);
-            [~, SOURCE] = pol2cart(TH+theta, R);
+
+            switch mesh_tp_flag
+                case false
+                    prop_c = (port.p1(1)+port.p2(1))/2;
+                    source_c = (port.p1(2)+port.p2(2))/2;
+                case true
+                    prop_c = (port.p1(2)+port.p2(2))/2;
+                    source_c = (port.p1(1)+port.p2(1))/2;
+            end
+
+
+            PROPc = PROP-prop_c;
+            SOURCEc = SOURCE-source_c;
+
+            [TH, R] = cart2pol(PROPc, SOURCEc);
+            [~, SOURCEc] = pol2cart(TH+theta, R);
+
+            SOURCE = SOURCEc + source_c;
 
             % interpolate source
             profile_interp = griddedInterpolant(axis_source.v, source_field,...

@@ -26,6 +26,7 @@ Under the `./examples` directory, live scripts demonstrate the working flow of t
 | 2D | Directional coupler | 2D Scattering | `directional_coupler.mlx` |
 | 2D | Grating coupler |2D Scattering | `grating_coupler.mlx` |
 | 2D | 1x2 Inverse-designed mode division multiplexer |2D Scattering | `mode_mux_2x1.mlx` |
+| 2D | Mie scattering (planar incident field) |2D Scattering | `mie_scattering.mlx` |
 | 2D | Transmission line | 2D Eigenmode (metal) | `transmission_line.mlx` |
 
 \* For the example file `mode_mux_2x1.mlx`, GDSII Toolbox is required (see section [GDSII Toolbox](#gdsii-toolbox)).

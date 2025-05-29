@@ -159,7 +159,7 @@ classdef (Hidden) Scattering2D < FDFD2D
                 case false
                     [~, ind_p] = min(abs(axis_prop.v-source.port.p1(1)));
                     Q(ind_p:end,:) = false;
-                case ture
+                case true
                     [~, ind_p] = min(abs(axis_prop.v-source.port.p1(2)));
                     Q(:,ind_p:end) = false;
             end
@@ -175,7 +175,7 @@ classdef (Hidden) Scattering2D < FDFD2D
             n_source = numel(source.neff);
             b = zeros(device.mesh.axis1.n*device.mesh.axis2.n,n_source);
             for ii = 1:n_source
-                fsrc_profile = FDFD2D.rotateProfile(source_field(:,ii), axis_source, axis_prop, source.theta);
+                fsrc_profile = FDFD2D.rotateProfile(source.port, mesh_tp_flag, source_field(:,ii), axis_source, axis_prop, source.theta);
                 if mesh_tp_flag
                     fsrc_profile = fsrc_profile.';
                 end
