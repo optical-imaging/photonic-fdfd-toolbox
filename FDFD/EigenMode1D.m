@@ -1,155 +1,177 @@
-classdef (Hidden) EigenMode1D < FDFD1D
-    % EigenMode1D: 1D eigenmode solver for electromagnetic analysis
+classdef (Hidden) EigenMode1D < EigenMode
+    %EigenMode1D: 1D FDFD eigenmode solver on an Axis mesh for TE/TM slab cross-sections
     %
-    % Description:
-    %   The `EigenMode1D` class is used for computing the eigenmodes of one-dimensional electromagnetic structures.
-    %   It provides capabilities to solve for the effective refractive index and the field distributions (electric and magnetic fields).
-    %   This class inherits from `FDFD1D` and utilizes finite-difference frequency-domain (FDFD) techniques for calculations.
+    % Key Properties (inherited from FDFD):
+    %   lam            - Wavelength (m)
+    %   mesh           - Axis mesh used by the eigenmode problem
+    %   bc             - BC1D boundary-condition object on the same axis
+    %   Ex,Ey,Ez       - Electric-field eigenmodes, size N×Nm
+    %   Hx,Hy,Hz       - Magnetic-field eigenmodes, size N×Nm
     %
-    % Properties:
-    %   mesh - The defined mesh grid along the 1D axis.
-    %   lam - The wavelength of the electromagnetic wave in the simulation (in meters).
-    %   solflag - A flag indicating if the solution has been computed.
-    %   Ex, Ey, Ez - Electric field components along x, y, and z dimensions.
-    %   Hx, Hy, Hz - Magnetic field components along x, y, and z dimensions.
-    %   pol - Polarization type ('TE' or 'TM').
-    %   num - Mode number to solve for.
-    %   neff - Effective refractive index of the computed mode.
+    % Key Properties (inherited from EigenMode, SetAccess = protected):
+    %   modenum        - Requested mode indices (vector)
+    %   neff           - Effective indices of solved modes, aligned with modenum
     %
-    % Methods:
-    %   EigenMode1D(eps, mu, axis, axis_label, wavelength, Name, Value) - Constructor to create a 1D eigenmode solver object.
-    %   printInfo() - Displays information about the computed mode.
+    % Key Properties (EigenMode1D-specific):
+    %   pol            - Polarization: 'TE'|'TM' (selects eigen formulation and field components)
     %
-    % Example:
-    %   % Define material properties, mesh grid, and wavelength
-    %   eps = [2.5, 2.5, 2.5];
-    %   mu = [1.0, 1.0, 1.0];
-    %   axis = Axis('x', 0, 1, 100);
-    %   axis_label = 'x';
-    %   wavelength = 1.55e-6;
+    % Dependent Properties:
+    %   label          - Axis label from mesh.label when mesh is assigned; [] otherwise
+    %   setflag        - True if lam, mesh, bc, and modenum are assigned (inherited dependent)
+    %   solflag        - True if all E/H field components are populated (inherited dependent)
     %
-    %   % Create an EigenMode1D solver object and compute the TE mode
-    %   emode = EigenMode1D(eps, mu, axis, axis_label, wavelength, 'ModeType', 'TE', 'ModeNum', 1);
-    %   emode.printInfo();
+    % Key Methods:
+    %   EigenMode1D(lam,modenum,pol)     - Construct 1D eigenmode solver with wavelength, modes, and polarization
+    %   get.label()                      - Return mesh.label if mesh is assigned
     %
-    % Notes:
-    %   - This class is marked as "Hidden", which means it is not intended to be directly accessed by users.
-    %   - Ensure that the axis object is defined properly, with the units set to meters.
+    %   setMesh(axis)                    - Assign Axis mesh to solver (calls FDFD.setMesh)
+    %   setBC(bc1d)                      - Assign BC1D and enforce bc label matches solver axis label
     %
-    % See Also:
-    %   FDFD, FDFD1D, Grid, Axis
+    %   solveFDFD(device1d,flipprop)     - Solve eigenmodes on Device1D and populate neff and E/H fields
+    %   printInfo()                      - Print wavelength, polarization, modenum, and neff (debug use)
+    %
+    % Key Methods (Static, Access = private):
+    %   assignField(axis_label,...)      - Map local (e1,e2,e3,h1,h2,h3) to (Ex,Ey,Ez,Hx,Hy,Hz) by axis label
 
-    properties (SetAccess = private)
+    properties
         pol
-        num
-        neff
+    end
+
+    properties (Dependent)
+        label
     end
 
     methods
-
-        function obj = EigenMode1D(eps, mu, axis, axis_label, wavelength, varargin)
-            % EigenMode1D: Constructor to create a 1D eigenmode solver object
-            %
-            %   Syntax:
-            %     obj = EigenMode1D(eps, mu, axis, axis_label, wavelength, Name, Value)
-            %
-            %   Input:
-            %     eps - Relative permittivity along each dimension (matrix).
-            %     mu - Relative permeability along each dimension (matrix).
-            %     axis - Axis object containing the mesh grid.
-            %     axis_label - Label indicating the direction of propagation ('x', 'y', or 'z').
-            %     wavelength - Operating wavelength (positive real scalar).
-            %
-            %   Name-Value Arguments:
-            %     'ModeType' - Type of mode ('TE' or 'TM'). Default is 'TE'.
-            %     'ModeNum' - Mode number to solve for. Default is 1.
-            
+        % constructor
+        function obj = EigenMode1D(wavelength, modenum, pol)
             arguments
-                eps (:,3) 
-                mu (:,3)
+                wavelength (1,1) double {mustBePositive} % in unit [m]
+                modenum (1,:) double {mustBeInteger, mustBePositive}
+                pol {mustBeMember(pol, {'TE','TM'})}
+            end
+            obj@EigenMode(wavelength, modenum);
+            obj.pol = pol;
+        end
+
+        % dependent
+        function val = get.label(obj)
+            if ~isempty(obj.mesh)
+                val = obj.mesh.label;
+            else
+                val = [];
+            end
+        end
+
+        % set protected properties
+        function setMesh(obj, axis)
+            arguments
+                obj
                 axis Axis
-                axis_label {mustBeMember(axis_label, {'x', 'y', 'z'})}
-                wavelength (1,1) double {mustBeReal, mustBePositive}
             end
-            arguments (Repeating)
-                varargin
+            obj.mesh = axis;
+        end
+
+        function setBC(obj, bc1d)
+            arguments
+                obj
+                bc1d BC1D
+            end
+            if ~strcmp(bc1d.label, obj.label)
+                dispError('EigenMode1D:BCLabelNotMatch');
+            end
+            obj.bc = bc1d;
+        end
+
+        % launch solver
+        function solveFDFD(obj, device, flipprop)
+            arguments
+                obj
+                device Device1D
+                flipprop (1,1) logical = false
             end
 
-            obj@FDFD1D(axis);
-
-            % Set up inputParser to handle name-value pairs
-            p = inputParser;
-            addParameter(p, 'ModeType', 'TE', @(x) ismember(x, {'TE', 'TM'})); % Default polarization mode is TE
-            addParameter(p, 'ModeNum', 1, @(x) isPositiveInt(x));
-            parse(p, varargin{:});
-            pol_mode = p.Results.ModeType;
-            n_mode = sort(p.Results.ModeNum);
+            % pre-check
+            if ~obj.setflag
+                dispError('EigenMode:SetUpEigenSolver');
+            end
+            if ~device.meshflag
+                dispError('Device2D:MeshDevice');
+            end
 
             % Constant
             eta0 = Constant("eta0").v;
-            k0 = 2*pi/wavelength;
-
-            % change axis unit to m
-            obj.mesh = axis; % remain original unit before changing
-            axis = axis.changeUnit('m');
+            k0 = 2*pi/obj.lam;
 
             % derivative matrices
-            DE2 = FDFD.DM1D(axis, 'E')/k0;
-            DH2 = FDFD.DM1D(axis, 'M')/k0;
+            DE1 = obj.DM1D(obj.mesh, 'E')/k0; % normalized with k0
+            DH1 = obj.DM1D(obj.mesh, 'M')/k0;
 
             % solve eigenmode
-            switch pol_mode
+            eps = device.eps;
+            mu = device.mu;
+            switch obj.pol
                 case 'TE'
-                    A = -(DH2*diag(sparse(mu(:,1)))*DE2+diag(sparse(eps(:,3))));
-                    [E3, G2] = eigs(A, diag(sparse(1./mu(:,2))), max(n_mode), -max(eps,[],"all"));
-                    neff = sqrt(-diag(G2));
+                    % construct coefficient matrix A and solve eigen equation
+                    A = DH1*spdiags(1./mu(:,3),0,obj.mesh.n,obj.mesh.n)*DE1 + spdiags(eps(:,2),0,obj.mesh.n,obj.mesh.n);
+                    [E2, G2] = eigs(A, spdiags(1./mu(:,1),0,obj.mesh.n,obj.mesh.n), max(obj.modenum), max(eps,[],"all"));
+                    neff = sqrt(diag(G2));
 
-                    H1 = diag(sparse(1./mu(:,1)))*DE2*E3;
-                    H2 = sqrt(diag(G2)).'.*(diag(sparse(1./mu(:,2)))*E3);
+                    % reconstruct H fields
+                    H1 = -neff.'/eta0.*(spdiags(1./mu(:,1),0,obj.mesh.n,obj.mesh.n)*E2);
+                    H3 = 1i/eta0*spdiags(1./mu(:,3),0,obj.mesh.n,obj.mesh.n)*DE1*E2;
 
+                    % sort eigenmodes
                     [~, ind] = sort(real(neff),'descend');
-                    e3 = E3(:,ind);
-                    h1 = H1(:,ind)./(-1i*eta0);
-                    h2 = H2(:,ind)./(-1i*eta0); % out of phase for Ez and Hy, because wave is propagating towards +x
+                    e2 = E2(:,ind);
+                    h1 = H1(:,ind);
+                    h3 = H3(:,ind); % out of phase for Ez and Hy, because wave is propagating towards +x
                     neff = neff(ind);
 
-                    e3 = e3(:,n_mode);
-                    h1 = h1(:,n_mode);
-                    h2 = h2(:,n_mode);
+                    % assign requested modes
+                    e2 = e2(:,obj.modenum);
+                    h1 = h1(:,obj.modenum);
+                    h3 = h3(:,obj.modenum);
 
-                    e1 = zeros(size(eps,1), numel(n_mode));
-                    e2 = zeros(size(eps,1), numel(n_mode));
-                    h3 = zeros(size(mu,1), numel(n_mode));
+                    e1 = zeros(obj.mesh.n, numel(obj.modenum));
+                    e3 = zeros(obj.mesh.n, numel(obj.modenum));
+                    h2 = zeros(obj.mesh.n, numel(obj.modenum));
+
                 case 'TM'
-                    A = -(DE2*diag(sparse(eps(:,1)))*DH2+diag(sparse(mu(:,3))));
-                    [H3, G2] = eigs(A, diag(sparse(1./eps(:,2))), max(n_mode), -max(eps,[],"all"));
-                    neff = sqrt(-diag(G2));
+                    A = DE1*spdiags(1./eps(:,3),0,obj.mesh.n,obj.mesh.n)*DH1+spdiags(mu(:,2),0,obj.mesh.n,obj.mesh.n);
+                    [H2, G2] = eigs(A, spdiags(1./eps(:,1),0,obj.mesh.n,obj.mesh.n), max(obj.modenum), max(eps,[],"all"));
+                    neff = sqrt(diag(G2));
 
-                    E1 = diag(sparse(1./eps(:,1)))*DH2*H3;
-                    E2 = sqrt(diag(G2)).'.*(diag(sparse(1./eps(:,2)))*H3);
+                    E1 = neff.'*eta0.*(spdiags(1./eps(:,1),0,obj.mesh.n,obj.mesh.n)*H2);
+                    E3 = -1i*eta0*spdiags(1./eps(:,3),0,obj.mesh.n,obj.mesh.n)*DH1*H2;
 
                     [~, ind] = sort(real(neff),'descend');
-                    h3 = H3(:,ind)./(-1i*eta0)/1i; % fix phase cause in EY
-                    e1 = E1(:,ind)/1i;
-                    e2 = E2(:,ind)/1i;
+                    h2 = H2(:,ind);
+                    e1 = E1(:,ind);
+                    e3 = E3(:,ind); % out of phase for Ez and Hy, because wave is propagating towards +x
                     neff = neff(ind);
 
-                    h3 = h3(:,n_mode);
-                    e1 = e1(:,n_mode);
-                    e2 = e2(:,n_mode);
+                    h2 = h2(:,obj.modenum);
+                    e1 = e1(:,obj.modenum);
+                    e3 = e3(:,obj.modenum);
 
-                    e3 = zeros(size(eps,1), numel(n_mode));
-                    h1 = zeros(size(mu,1), numel(n_mode));
-                    h2 = zeros(size(mu,1), numel(n_mode));
+                    h1 = zeros(obj.mesh.n, numel(obj.modenum));
+                    h3 = zeros(obj.mesh.n, numel(obj.modenum));
+                    e2 = zeros(obj.mesh.n, numel(obj.modenum));
             end
 
-            [E, H] = EigenMode1D.assignField(axis_label, e1, e2, e3, h1, h2, h3);
+            if flipprop
+                e2_temp = e2; e3_temp = e3;
+                h2_temp = h2; h3_temp = h3;
 
-            obj.lam = wavelength;
-            obj.solflag = true;
-            obj.pol = pol_mode;
-            obj.num = n_mode;
-            obj.neff = neff(n_mode);
+                e2 = -e3_temp;
+                e3 = e2_temp;
+                h2 = -h3_temp;
+                h3 = h2_temp;
+            end
+
+            [E, H] = EigenMode1D.assignField(obj.mesh.label, e1, e2, e3, h1, h2, h3);
+
+            obj.neff = neff(obj.modenum);
             obj.Ex = E.Ex;
             obj.Ey = E.Ey;
             obj.Ez = E.Ez;
@@ -158,39 +180,53 @@ classdef (Hidden) EigenMode1D < FDFD1D
             obj.Hz = H.Hz;
         end
 
+        % display
         function printInfo(obj)
-            info_name = {'Object name';
-                         'Wavelength';
-                         'Polarization mode';
-                         'Mode number';
-                         'neff'};
-            value = {inputname(1);
-                     [num2str(obj.lam), ' m'];
-                     obj.pol;
-                     obj.num;
-                     obj.neff};
+            info_name = {
+                'Object name';
+                'Wavelength';
+                'Polarization mode';
+                'Mode number';
+                'neff'
+                };
+
+            lam_str = [num2str(obj.lam), ' m'];
+            if isscalar(obj.modenum)
+                num_str = num2str(obj.modenum);
+            else
+                num_str = strjoin(string(obj.modenum), ', ');
+            end
+            if isscalar(obj.neff)
+                neff_str = num2str(obj.neff);
+            else
+                neff_str = strjoin(string(obj.neff), ', ');
+            end
+
+            value = {
+                inputname(1);
+                lam_str;
+                obj.pol;
+                num_str;
+                neff_str
+                };
 
             maxNameLength = max(cellfun(@length, info_name));
             for ii = 1:numel(info_name)
-                fprintf('%*s: %-10s\n', maxNameLength+1, info_name{ii}, value{ii});
+                fprintf('%*s: %-s\n', maxNameLength + 1, info_name{ii}, value{ii});
             end
         end
 
     end
 
     methods (Static, Access = private)
-
         function [E, H] = assignField(axis_label, e1, e2, e3, h1, h2, h3)
-            perm = struct('x', [2,3,1], 'y', [1,2,3], 'z', [3,1,2]);
+            perm = struct('x', [1,2,3], 'y', [3,1,2], 'z', [2,3,1]);
             p = perm.(axis_label);
 
             E.Ex = eval(sprintf('e%d', p(1))); H.Hx = eval(sprintf('h%d', p(1)));
             E.Ey = eval(sprintf('e%d', p(2))); H.Hy = eval(sprintf('h%d', p(2)));
             E.Ez = eval(sprintf('e%d', p(3))); H.Hz = eval(sprintf('h%d', p(3)));
         end
-
     end
-
-
 
 end

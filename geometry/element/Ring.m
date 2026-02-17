@@ -1,108 +1,81 @@
 classdef Ring < Layout2D
-    % Ring: Concentric ring
+    %Ring: Annular (ring-shaped) planar geometry
     %
-    % Description:
-    %   The `Ring` class represents a concentric ring in a 2D plane.
-    %   It inherits from `Geometry2D` and provides properties and methods specific to ring geometries.
+    % Purpose:
+    %    Represents a ring region defined by inner and outer radii.
     %
-    % Properties:
-    %   u - Length unit used for the geometry (e.g., 'm', 'cm', 'mm', 'um', 'nm', 'A').
-    %   s - Polyshape representing the 2D shape.
-    %   ri - Inner radius of the ring.
-    %   ro - Outer radius of the ring.
-    %   o - Center coordinates of the ring.
-    %   n - Number of vertices used to approximate the ring.
+    % Key Properties:
+    %    s  - polyshape representing the annulus
+    %    ri - The inner radius of the ring.
+    %    ro - The outer radius of the ring.
+    %    o  - The center coordinates of the ring.
+    %    n  - The number of vertices used to approximate the ring.
     %
-    % Methods:
-    %   Ring(radius, center, unit, num_points) - Constructor to create an instance of the Ring class.
-    %   printInfo() - Prints information about the ring object.
-    %   changeUnit(new_unit) - Changes the length unit of the geometry.
-    %   combineGeometry(operation, varargin) - Combines multiple Geometry2D objects based on the specified operation.
-    %   dispImg(varargin) - Displays the 2D geometry.
-    %   CrossSection(line) - Computes the cross-section of the geometry with a given line.
-    %
-    % See also:
-    %   Geometry, Geometry2D
+    % Key Methods:
+    %    Ring([ri ro], c, n)      - Construct ring geometry
+    %    combineGeometry(...)    - Combine ring with other planar geometries
 
     properties
         ri
         ro
         o
         n
+        theta_range % Added to store the angle range
     end
 
     methods
-
-        function obj = Ring(radius, center, unit, num_points)
-            % Ring constructor
-            %   Constructs an instance of the Ring class with specified inner and outer radii, center, unit, and number of points.
-            %
-            %   Syntax:
-            %     obj = Ring(radius, center, unit, num_points)
-            %
-            %   Input:
-            %     radius - A two-element vector specifying the inner and outer radii (positive values).
-            %     center - Center coordinates of the ring (real values).
-            %     unit - Length unit (must be one of: 'm', 'cm', 'mm', 'um', 'nm', 'A'). Default is 'm'.
-            %     num_points - Number of vertices used to approximate the ring (positive integer). Default is 200.
-            %
-            %   Output:
-            %     obj - An instance of the Ring class.
-            
+        function obj = Ring(radius, center, theta_range, num_points)
             arguments
                 radius (1,2) {mustBePositive}
                 center (1,2) double {mustBeReal}
-                unit {mustBeMember(unit, {'m', 'cm', 'mm', 'um', 'nm', 'A'})} = 'm'
+                theta_range (1,2) double = [0, 2*pi]
                 num_points (1,1) {mustBeInteger, mustBePositive} = 200
             end
 
-            % check inner and outer radius
-            if radius(1)==radius(2)
-                dispError('Ring:RingRadiusEqual');
+            % Ensure inner and outer radii are distinct and sorted
+            if radius(1) == radius(2)
+                error('Inner and outer radii must be different.');
+            end
+            radius = sort(radius);
+
+            % Check if it is a full ring (360 degrees)
+            isFull = abs(diff(theta_range)) >= 2*pi;
+
+            % Generate angles based on the range provided
+            % This will follow the direction of the input (e.g., [pi/2, -pi/2] goes CW)
+            theta = linspace(theta_range(1), theta_range(2), num_points);
+
+            if isFull
+                % For a full ring, use the subtraction method to ensure a hole is created
+                theta_full = linspace(0, 2*pi, num_points + 1);
+                theta_full(end) = [];
+
+                x_in = radius(1)*cos(theta_full) + center(1);
+                y_in = radius(1)*sin(theta_full) + center(2);
+                x_out = radius(2)*cos(theta_full) + center(1);
+                y_out = radius(2)*sin(theta_full) + center(2);
+
+                ring = subtract(polyshape(x_out, y_out), polyshape(x_in, y_in));
             else
-                radius = sort(radius);
+                % For a segment, we create one continuous boundary
+                % Trace outer arc forward, then inner arc backward
+                x_out = radius(2)*cos(theta) + center(1);
+                y_out = radius(2)*sin(theta) + center(2);
+
+                x_in = radius(1)*cos(theta) + center(1);
+                y_in = radius(1)*sin(theta) + center(2);
+
+                % FLIPLR ensures the inner arc returns to the start point correctly
+                ring = polyshape([x_out, fliplr(x_in)], [y_out, fliplr(y_in)]);
             end
 
-            num = num_points;
-            theta = linspace(0, 2*pi, num+1);
-            theta(end) = [];
-
-            x_in = radius(1)*cos(theta) + center(1);
-            y_in = radius(1)*sin(theta) + center(2);
-            disk_in = polyshape(x_in, y_in);
-
-            x_out = radius(2)*cos(theta) + center(1);
-            y_out = radius(2)*sin(theta) + center(2);
-            disk_out = polyshape(x_out, y_out);
-
-            ring = subtract(disk_out, disk_in);
-
-            obj@Layout2D(ring, unit);
+            % Assignments
+            obj@Layout2D(ring);
             obj.ri = radius(1);
             obj.ro = radius(2);
             obj.o = center;
             obj.n = num_points;
+            obj.theta_range = theta_range;
         end
-
-        % Display
-        function printInfo(obj)
-            info_name = {'Object Name';
-                'Unit';
-                'Inner radius';
-                'Outer radius';
-                'Center'};
-            value = {inputname(1);
-                obj.u;
-                num2str(obj.ri);
-                num2str(obj.ro);
-                num2str(['[',num2str(obj.c(1)),',',num2str(obj.c(2)),']'])};
-
-            maxNameLength = max(cellfun(@length, info_name));
-            for ii = 1:numel(info_name)
-                fprintf('%*s: %-10s\n', maxNameLength+1, info_name{ii}, value{ii});
-            end
-        end
-
     end
-
 end

@@ -1,26 +1,16 @@
 classdef Rectangle < Layout2D
-    % Rectangle: Vertical rectangle
+    %Rectangle: Axis-aligned rectangular planar geometry
     %
-    % Description:
-    %   The `Rectangle` class represents a rectangular shape in a 2D plane.
-    %   It inherits from `Geometry2D` and provides properties and methods specific to rectangular geometries.
+    % Purpose:
+    %   Represents a rectangle in the 2D plane.
     %
-    % Properties:
-    %   u - Length unit used for the geometry (e.g., 'm', 'cm', 'mm', 'um', 'nm', 'A').
-    %   s - Polyshape representing the 2D shape.
-    %   l1 - Length of the sides along the first dimension.
-    %   l2 - Length of the sides along the second dimension.
+    % Key Properties:
+    %   s  - polyshape representing the rectangle
+    %   l1 - The side length along the first dimension (e.g., x).
+    %   l2 - The side length along the second dimension (e.g., y).
     %
-    % Methods:
-    %   Rectangle(length1, length2, reference_point, ref_coord, unit) - Constructor to create an instance of the Rectangle class.
-    %   printInfo() - Prints information about the rectangle object.
-    %   changeUnit(new_unit) - Changes the length unit of the geometry.
-    %   combineGeometry(operation, varargin) - Combines multiple Geometry2D objects based on the specified operation.
-    %   dispImg(varargin) - Displays the 2D geometry.
-    %   CrossSection(line) - Computes the cross-section of the geometry with a given line.
-    %
-    % See also:
-    %   Geometry, Geometry2D
+    % Key Methods:
+    %   Rectangle(l1, l2, ref, coord) - Construct rectangle using reference convention
 
     properties
         l1
@@ -28,14 +18,12 @@ classdef Rectangle < Layout2D
     end
 
     methods
-
-         function obj = Rectangle(length1, length2, reference_point, ref_coord, unit)
+        function obj = Rectangle(length1, length2, reference_point, ref_coord)
             arguments
                 length1 (1,1) {mustBeReal, mustBePositive}
                 length2 (1,1) {mustBeReal, mustBePositive}
-                reference_point {mustBeMember(reference_point,{'tl', 'bl', 'tr', 'br', 'c'})} = 'bl'
+                reference_point {mustBeMember(reference_point,{'tl', 'bl', 'tr', 'br', 'c'})} = 'c'
                 ref_coord (1,2) {mustBeReal} = [0,0]
-                unit {mustBeMember(unit, {'m', 'cm', 'mm', 'um', 'nm', 'A'})} = 'm'
             end
 
             switch reference_point
@@ -59,11 +47,10 @@ classdef Rectangle < Layout2D
             coord1 = [lower_left(1), upper_right(1), upper_right(1), lower_left(1)];
             coord2 = [lower_left(2), lower_left(2), upper_right(2), upper_right(2)];
 
-            obj@Layout2D(polyshape(coord1, coord2), unit);
+            obj@Layout2D(polyshape(coord1, coord2));
             obj.l1 = length1;
             obj.l2 = length2;
         end
-
     end
 
 end

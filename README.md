@@ -2,9 +2,6 @@
 Photonic Finite-Difference Frequency-Domain (FDFD) Toolbox is a MATLAB Community Toolbox project, aiming 
 to provide intuitive framework for photonic devices simulation using MATLAB.
 
-> **Note:** The toolbox is currently in its early development stage. New features for high-dimensional 
-simulation, advanced analysis, and optimization will be coming in next release!
-
 ## Key Features
 - **Customizable Geometry**: Simple geometry and mesh creation.
 - **Object-Oriented Implementation**: Leverage modular MATLAB Object-Oriented Programming (OOP) capability
@@ -16,20 +13,22 @@ for expandability and scalability.
 ## Toolbox Installation
 1. Clone/download this repository.
 2. Start MATLAB.
-3. Install the Toolbox by double-clicking on the `FDFDPhotonicToolbox.mltbx` in MATLAB.
+3. Install the Toolbox by double-clicking on the `PhotonicFDFDToolbox.mltbx` in MATLAB.
 
 ## Examples 
-Under the `./examples` directory, live scripts demonstrate the working flow of the Toolbox:
+Under the `./example` directory, live scripts demonstrate the working flow of the Toolbox:
 
-| Dimension | Structure | Description | File Name | 
-|---|---|---|---|
-| 2D | Directional coupler | 2D Scattering | `directional_coupler.mlx` |
-| 2D | Grating coupler |2D Scattering | `grating_coupler.mlx` |
-| 2D | 1x2 Inverse-designed mode division multiplexer |2D Scattering | `mode_mux_2x1.mlx` |
-| 2D | Mie scattering (planar incident field) |2D Scattering | `mie_scattering.mlx` |
-| 2D | Transmission line | 2D Eigenmode (metal) | `transmission_line.mlx` |
+| Dimension | Structure | Description | File Name | Note |
+|---|---|---|---| --- |
+| 2D | Directional coupler | 2D Scattering | `directional_coupler.mlx` | 1D eigenmode source |
+| 2D | Grating coupler |2D Scattering | `grating_coupler.mlx` | Gaussian beam source; source rotation |
+| 2D | 1x2 Inverse-designed mode division multiplexer |2D Scattering | `mode_mux_2x1.mlx` | GDSII file import |
+| 2D | Mie's scattering|2D Scattering | `mide_scattering.mlx` | Plane wave source |
+| 2D | Transmission line | 2D Eigenmode | `transmission_line.mlx` | Metal material |
+| 2.5D | Mode (de)multiplexer | 2.5D varFDFD | `mux_varFDFD.mlx` | Layered device; varFDFD solver |
+| 2.5D | Ring resonator | 2.5D varFDFD | `ring_resonator.mlx` | Layered device constructed with built-in tool|
 
-\* For the example file `mode_mux_2x1.mlx`, GDSII Toolbox is required (see section [GDSII Toolbox](#gdsii-toolbox)).
+\* For the examples `mode_mux_2x1.mlx` and  `mux_varFDFD.mlx`, GDSII Toolbox is required (see section [GDSII Toolbox](#gdsii-toolbox)).
 
 
 
@@ -68,7 +67,7 @@ We appreciate your feedback and contributions! If you encounter issues, have sug
 like to contribute to this project, please feel free to open an issue or contact us.
 
 For questions or inquiries, please contact:
-- Dr. Shuo Pang: pang@ucf.edu
+- Dr. Shuo Pang: pang@alumni.caltech.edu
 - Xichen Shan: xcshan@ucf.edu
 
 

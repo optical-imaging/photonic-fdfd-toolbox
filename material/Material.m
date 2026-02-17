@@ -1,18 +1,19 @@
 classdef Material
-    % Material: Material for device
+    %Material: Linear isotropic material container used by Device meshing
     %
-    % Description:
-    %   The `Material` class is used to define the material properties for a device.
-    %   It assumes that the material is linear, homogeneous, and isotropic.
+    % Key Properties (SetAccess = private):
+    %   eps  - Relative permittivity (scalar)
+    %   mu   - Relative permeability (scalar)
+    %   lam  - Wavelength associated with database lookup (numeric) or 'NotDefined'
     %
-    % Properties:
-    %   eps - Relative permittivity of the material.
-    %   mu - Relative permeability of the material.
-    %   lam - Corresponding wavelength.
+    % Key Methods:
+    %   Material(input1,input2)  - Construct from (eps,mu) or (material_name, wavelength)
+    %   printInfo()              - Print eps/mu/lam information (debug use)
     %
-    % Methods:
-    %   Material(input1, input2) - Constructor to create an instance of the Material class.
-    %   printInfo() - Prints information about the material properties.
+    % Key Methods (Static, private):
+    %   createFromValues(eps,mu)                 - Validate and return eps/mu values
+    %   createFromDatabase(material_name,lam)    - Load material data and return eps/mu at wavelength
+    %   getMaterialFromDatabase(data,lam)        - Exact-match or interpolate eps/mu from database table
 
     properties (SetAccess = private)
         eps
@@ -37,9 +38,9 @@ classdef Material
             %
             %   Output:
             %     obj - An instance of the Material class.
-            
+
             arguments
-                input1 
+                input1
                 input2 = [];
             end
             if isnumeric(input1) && isscalar(input1)
@@ -65,13 +66,13 @@ classdef Material
         % Display
         function printInfo(obj)
             info_name = {'Material Name';
-                         'Epsilon_r';
-                         'Mu_r';
-                         'Wavelength'};
+                'Epsilon_r';
+                'Mu_r';
+                'Wavelength'};
             value = {inputname(1);
-                     num2str(obj.eps);
-                     num2str(obj.mu);
-                    [num2str(obj.lam),' m']};
+                num2str(obj.eps);
+                num2str(obj.mu);
+                [num2str(obj.lam),' m']};
 
             maxNameLength = max(cellfun(@length, info_name));
             for ii = 1:numel(info_name)

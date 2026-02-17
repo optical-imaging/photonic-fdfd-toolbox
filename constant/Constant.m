@@ -1,29 +1,13 @@
 classdef Constant
-    % Constant: Physics Constant Class
+    %Constant: SI physical-constant container for solver/material computations
     %
-    % Description:
-    %   The `Constant` class provides a convenient way to access commonly used
-    %   physical constants, all in SI units. The available constants are:
-    %   c0 - Speed of light in vacuum
-    %   eta0 - Characteristic impedance of vacuum
-    %   eps0 - Permittivity of free space
-    %   mu0 - Permeability of free space
+    % Key Properties (SetAccess = private):
+    %   v     - Numeric constant value (SI)
+    %   name  - Constant identifier: 'c0'|'eta0'|'eps0'|'mu0'
+    %   u     - Unit string in internal SI-notation (for display/debug)
     %
-    %   Each constant is represented by a value (`v`), its name (`name`), and the unit (`u`).
-    %
-    % Usage:
-    %   constant = Constant('c0');
-    %
-    % Properties:
-    %   v - The numerical value of the constant.
-    %   name - The name of the constant.
-    %   u - The unit of the constant in SI notation.
-    %
-    % Methods:
-    %   Constant(constant_name) - Constructor method to create an instance of the Constant class.
-    %     The `constant_name` must be one of the following: 'c0', 'eta0', 'eps0', 'mu0'.
-
-
+    % Key Methods:
+    %   Constant(name)  - Construct constant object by identifier and populate v/u
 
     properties (SetAccess = private)
         v
